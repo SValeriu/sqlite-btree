@@ -50,6 +50,11 @@
 # define _LARGEFILE_SOURCE 1
 #endif
 
+/* @mx the two files is added by me */
+#include "errorHandle.h"
+#include "config.h"
+
+
 #include "sqlite3.h"
 #include "hash.h"
 #include <stdio.h>
@@ -1385,7 +1390,9 @@ extern int sqlite3_always_code_trigger_setup;
 ** it allows the operator to set a breakpoint at the spot where database
 ** corruption is first detected.
 */
-#ifdef SQLITE_DEBUG
+/* @mx I comment this one to make others can works well */
+//#ifdef SQLITE_DEBUG
+#if 0
   extern int sqlite3Corrupt(void);
 # define SQLITE_CORRUPT_BKPT sqlite3Corrupt()
 #else
