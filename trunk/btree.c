@@ -2744,7 +2744,8 @@ int sqlite3BtreeLast(BtCursor *pCur, int *pRes){
 */
 int sqlite3BtreeMoveto(BtCursor *pCur, const void *pKey, i64 nKey, int *pRes){
   int rc;
-  rc = moveToRoot(pCur);
+  rc = moveToRoot(pCur); /* @mx search from root */
+  
   if( rc ) return rc;
   assert( pCur->pPage );
   assert( pCur->pPage->isInit );
@@ -2753,23 +2754,27 @@ int sqlite3BtreeMoveto(BtCursor *pCur, const void *pKey, i64 nKey, int *pRes){
     assert( pCur->pPage->nCell==0 );
     return SQLITE_OK;
   }
+  
    for(;;){
     int lwr, upr;
     Pgno chldPg;
     MemPage *pPage = pCur->pPage;
-    int c = -1;  /* pRes return if table is empty must be -1 */
+    int c = -1;  /* pRes return if table is empty must be -1 */ /* @mx c means pRes */
     lwr = 0;
     upr = pPage->nCell-1;
     if( !pPage->intKey && pKey==0 ){
       return SQLITE_CORRUPT_BKPT;
     }
     pageIntegrity(pPage);
+
+    /* @mx use a binary search to find the right branch */
     while( lwr<=upr ){
       void *pCellKey;
       i64 nCellKey;
       pCur->idx = (lwr+upr)/2;
       pCur->info.nSize = 0;
-      sqlite3BtreeKeySize(pCur, &nCellKey);
+      sqlite3BtreeKeySize(pCur, &nCellKey);/* @mx nCellKey= the size of current cell. nCellKey = cell's value if it's an interger key*/
+
       if( pPage->intKey ){
         if( nCellKey<nKey ){
           c = -1;
@@ -2792,12 +2797,15 @@ int sqlite3BtreeMoveto(BtCursor *pCur, const void *pKey, i64 nKey, int *pRes){
           if( rc ) return rc;
         }
       }
+
+
       if( c==0 ){
+        /* @mx if we only store data in leaf but the page is not leaf */
         if( pPage->leafData && !pPage->leaf ){
           lwr = pCur->idx;
           upr = lwr - 1;
           break;
-        }else{
+        }else{ /* @mx we have found it, if the page is leaf *or* the internal node can store data */
           if( pRes ) *pRes = 0;
           return SQLITE_OK;
         }
@@ -2807,15 +2815,19 @@ int sqlite3BtreeMoveto(BtCursor *pCur, const void *pKey, i64 nKey, int *pRes){
       }else{
         upr = pCur->idx-1;
       }
-    }
+    }/* @mx end of while */
+
     assert( lwr==upr+1 );
     assert( pPage->isInit );
+    /* @mx ? pPage->leaf must be false since it break only from "if(pPage->leafData && !pPage->leaf)" 
+     * It seems it's possible lwc>upr and c!=0
+     * */
     if( pPage->leaf ){
       chldPg = 0;
     }else if( lwr>=pPage->nCell ){
-      chldPg = get4byte(&pPage->aData[pPage->hdrOffset+8]);
+      chldPg = get4byte(&pPage->aData[pPage->hdrOffset+8]); /* @mx deal with overflow page*/
     }else{
-      chldPg = get4byte(findCell(pPage, lwr));
+      chldPg = get4byte(findCell(pPage, lwr));	/* @mx deal with no overflow page*/
     }
     if( chldPg==0 ){
       assert( pCur->idx>=0 && pCur->idx<pCur->pPage->nCell );
@@ -4544,7 +4556,7 @@ int sqlite3BtreeInsert(
   const void *pData, int nData   /* The data of the new record */
 ){
   int rc;
-  int loc;
+  int loc;	/* @mx it imply the loaction of the searched entry */
   int szNew;
   MemPage *pPage;
   Btree *pBt = pCur->pBt;
@@ -4562,6 +4574,8 @@ int sqlite3BtreeInsert(
   if( checkReadLocks(pBt, pCur->pgnoRoot, pCur) ){
     return SQLITE_LOCKED; /* The table pCur points to has a read lock */
   }
+  
+  /* @mx find out (pKey, nKey) first , pCur now point to the found entry */
   rc = sqlite3BtreeMoveto(pCur, pKey, nKey, &loc);
   if( rc ) return rc;
   pPage = pCur->pPage;

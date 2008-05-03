@@ -440,7 +440,7 @@ void sqlite3SetString(char **pz, ...){
 ** to NULL.
 */
 void sqlite3Error(sqlite3 *db, int err_code, const char *zFormat, ...){
-  if( db && (db->pErr || (db->pErr = sqlite3ValueNew())) ){
+  if( db && (db->pErr) ){
     db->errCode = err_code;
     if( zFormat ){
       char *z;
@@ -448,9 +448,6 @@ void sqlite3Error(sqlite3 *db, int err_code, const char *zFormat, ...){
       va_start(ap, zFormat);
       z = sqlite3VMPrintf(zFormat, ap);
       va_end(ap);
-      sqlite3ValueSetStr(db->pErr, -1, z, SQLITE_UTF8, sqlite3FreeX);
-    }else{
-      sqlite3ValueSetStr(db->pErr, 0, 0, SQLITE_UTF8, SQLITE_STATIC);
     }
   }
 }

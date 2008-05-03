@@ -52,12 +52,16 @@
 
 #include "sqlite3.h"
 #include "hash.h"
-#include "parse.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <stddef.h>
+
+struct Vdbe{
+	int JustNull;
+};
+typedef struct Vdbe Vdbe;
 
 /*
 ** The maximum number of in-memory pages to use for the main database
@@ -226,7 +230,6 @@ struct BusyHandler {
 ** Defer sourcing vdbe.h and btree.h until after the "u8" and 
 ** "BusyHandler typedefs.
 */
-#include "vdbe.h"
 #include "btree.h"
 
 /*
@@ -1198,6 +1201,7 @@ struct Parse {
   const char *zAuthContext; /* The 6th parameter to db->xAuth callbacks */
 };
 
+
 /*
 ** An instance of the following structure can be declared on a stack and used
 ** to save the Parse.zAuthContext value so that it can be restored later.
@@ -1630,6 +1634,8 @@ int sqlite3ValueBytes(sqlite3_value*, u8);
 void sqlite3ValueSetStr(sqlite3_value*, int, const void *,u8, void(*)(void*));
 void sqlite3ValueFree(sqlite3_value*);
 sqlite3_value *sqlite3ValueNew(void);
+
+
 sqlite3_value *sqlite3GetTransientValue(sqlite3*db);
 int sqlite3ValueFromExpr(Expr *, u8, u8, sqlite3_value **);
 void sqlite3ValueApplyAffinity(sqlite3_value *, u8, u8);
