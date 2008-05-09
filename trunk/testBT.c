@@ -7,7 +7,15 @@ void testSearch();
 
 void testBT(){
 	loadRCconfig();
-	testSearch();
+	if(config.BTop==BT_INSERT){
+		testInsert();
+	}
+	else if(config.BTop==BT_SEARCH){
+		testSearch();
+	}
+	else{
+		printf("no such operation!\n");
+	}
 }
     
     // Do an insert and verify that the database file grows in size.
@@ -28,6 +36,7 @@ void testInsert(){
 	double totalTime=0;
 
 	FILE* fp=fopen(config.BTtestcase,"r");
+	FILE* fpTable=fopen(config.BTmetafile,"w");
 
 	//= Create a B-Tree file =
 	//Open B-Tree
@@ -44,12 +53,14 @@ void testInsert(){
 	//Create a Cursor for the B-Tree
 	sqlite3BtreeCursor(pBt, iTable, 1, NULL, notUsed, &pCur);
 	errorHandle(rc,"can't create btree cursor");
+
+	fprintf(fpTable,"%d\n",iTable);
 	//= end create =
 
 	//= Insert data into the file =
 	for (i=0; i<config.BTrecordnum;i++) {
-		sqlite3BtreeBeginTrans(pBt, 1);
 
+		printf("insert record %d\n",i+1);
 		//sqlite3Randomness(8,(void*)&nKey);
 		fscanf(fp,"%lld",&nKey);
 		
@@ -89,7 +100,7 @@ void testSearch(){
 	int rc;
 	
 	void* notUsed;
-	//i64 nKey;
+	i64 nKey;
 	//void * pData;
 	//int nData;
 	int Res;
@@ -98,12 +109,15 @@ void testSearch(){
 	double totalTime=0;
 
 	FILE* fp=fopen(config.BTtestcase,"r");
+	FILE* fpTable=fopen("iTable","r");
+
 
 	//= Create a B-Tree file =
 	//Open B-Tree
 	rc = sqlite3BtreeOpen(config.BTdatfile,&pBt,BTREE_OMIT_JOURNAL);		
 	errorHandle(rc,"can't open the data base file");
 
+	fscanf(fpTable,"%d",&iTable);
 	//Create a Cursor for the B-Tree
 	sqlite3BtreeCursor(pBt, iTable, 0, NULL, notUsed, &pCur);
 	errorHandle(rc,"can't create btree cursor");
@@ -111,9 +125,11 @@ void testSearch(){
 
 	//= Insert data into the file =
 	for (i=0; i<config.BTrecordnum;i++) {
-
+		printf("search record %d\n",i+1);
+		
+		nKey = i;
 		start_timer();
-		rc = sqlite3BtreeMoveto(pCur, notUsed, (i64)i, &Res);
+		rc = sqlite3BtreeMoveto(pCur, notUsed, nKey, &Res);
 		errorHandle(rc,"can't search btree");
 		totalTime += get_timer();
 
