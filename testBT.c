@@ -109,7 +109,7 @@ void testSearch(){
 	double totalTime=0;
 
 	FILE* fp=fopen(config.BTtestcase,"r");
-	FILE* fpTable=fopen("iTable","r");
+	FILE* fpTable=fopen(config.BTmetafile,"r");
 
 
 	//= Create a B-Tree file =
