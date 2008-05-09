@@ -32,6 +32,7 @@ struct config
   /* configuration for testBT */
   char * BTtestcase;
   char * BTdatfile;
+  char * BTmetafile;
   char * BTrecordfile;
   int BTrecordnum;
   int BTop; 

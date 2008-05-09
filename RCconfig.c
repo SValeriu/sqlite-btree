@@ -93,6 +93,9 @@ struct pro {
 		"BTdatfile", PRO_STR, {"test.bt",0}, &(config.BTdatfile)
 	},
 	{
+		"BTmetafile", PRO_STR, {"iTable",0}, &(config.BTmetafile)
+	},
+	{
 		"BTrecordfile", PRO_STR, {"btrecord",0}, &(config.BTrecordfile)
 	},
 	{
