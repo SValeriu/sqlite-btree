@@ -43,7 +43,7 @@ void testInsert(){
 	rc = sqlite3BtreeOpen(config.BTdatfile,&pBt,BTREE_OMIT_JOURNAL);		
 	errorHandle(rc,"can't open the data base file");
 
-	//sqlite3BtreeSetPageSize(pBt, pageSize, -1);
+	sqlite3BtreeSetPageSize(pBt, config.BTpagesize, -1);
 	sqlite3BtreeBeginTrans(pBt, 1);
 
 	//Create a root page for the btree, the page no is iTable
@@ -141,13 +141,7 @@ void testSearch(){
     // generate random queries
 	printf("pagesize = %d\n",sqlite3BtreeGetPageSize(pBt));
 
-	/*
-	//= Dump the b-tree=
-	for(i=1;i<=RECORD_NUM;i++){
-		rc = sqlite3BtreePageDump(pBt,  i , 0 );
-		errorHandle(rc,"can't dump btree page");
-	}
-	*/
+
 
 
 }

@@ -99,7 +99,10 @@ struct pro {
 		"BTrecordfile", PRO_STR, {"btrecord",0}, &(config.BTrecordfile)
 	},
 	{
-		"BTrecordnum", PRO_INT, {"",BT_INSERT}, &(config.BTrecordnum)  
+		"BTpagesize", PRO_INT, {"",512}, &(config.BTpagesize)  
+	},
+	{
+		"BTrecordnum", PRO_INT, {"",0}, &(config.BTrecordnum)  
 	},
 	{
 		"BTop", PRO_INT, {"",BT_INSERT}, &(config.BTop)  /* BT_INSERT,BT_SEARCH */
