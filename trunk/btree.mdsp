@@ -116,5 +116,10 @@ extraResourceOptions=
 [Other]
 1=.rc
 [History]
-.rc,466
-testBT.c,174
+main.c,0
+testBT.c,978
+.rc,544
+RCconfig.c,3497
+btree-wraper.c,92
+btree.c,0
+RCconfig.h,1150

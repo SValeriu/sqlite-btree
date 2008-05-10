@@ -34,6 +34,7 @@ struct config
   char * BTdatfile;
   char * BTmetafile;
   char * BTrecordfile;
+  int BTpagesize;
   int BTrecordnum;
   int BTop; 
 }config;
